@@ -1,20 +1,19 @@
-import math
-import numpy
 import random
 
 # note that this only works for a single layer of depth
 INPUT_NODES = 2
 OUTPUT_NODES = 1
 HIDDEN_NODES = 2
+first = True
 
 # 15000 iterations is a good point for playing with learning rate
-MAX_ITERATIONS = 130000
+MAX_ITERATIONS = 10000
 
 # setting this too low makes everything change very slowly, but too high
 # makes it jump at each and every example and oscillate. I found .5 to be good
-LEARNING_RATE = .2
+LEARNING_RATE = .5
 
-print "Neural Network Program"
+print("Neural Network Program")
 
 class network:
     def __init__(self, input_nodes, hidden_nodes, output_nodes, learning_rate):
@@ -41,7 +40,7 @@ class network:
         for i in range(self.input_nodes, self.total_nodes):
             self.thresholds[i] = random.random() / random.random()
             for j in range(i + 1, self.total_nodes):
-                self.weights[i][j] = random.random() * 2
+                self.weights[i][j] = 1/(1+math.exp(-random.random()))
 
     def process(self):
         # update the hidden nodes
@@ -98,9 +97,9 @@ class network:
 
 class sampleMaker:
     def __init__(self, network):
-        self.counter = 0
+        self.counter = random.randrange(0,3)
         self.network = network
-
+        #self.counter = 0
     def setXor(self, x):
         if x == 0:
             self.network.values[0] = 1
@@ -121,8 +120,8 @@ class sampleMaker:
 
     def setNextTrainingData(self):
         self.setXor(self.counter % 4)
-        self.counter += 1
-
+        #self.counter += 1
+        self.counter = random.randrange(0,3)
 # start of main program loop, initialize classes
 net = network(INPUT_NODES, HIDDEN_NODES, OUTPUT_NODES, LEARNING_RATE)
 samples = sampleMaker(net)
@@ -133,10 +132,13 @@ for i in range(MAX_ITERATIONS):
     error = net.processErrors()
 
     # prove that we got the right answers(ish)!
-    if i > (MAX_ITERATIONS - 5):
+    if i > (MAX_ITERATIONS - 10000) and (first == False):
         output = (net.values[0], net.values[1], net.values[4], net.expectedValues[4], error)
-        print output
+        print(output)
+    if (error < 0.1) and first: 
+        first = False
+        print('first one at ', i)
 
 # display final parameters
-print net.weights
-print net.thresholds
+#print(net.weights)
+#print(net.thresholds)
